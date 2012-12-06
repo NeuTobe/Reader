@@ -10,11 +10,16 @@
 
 @protocol writeOrReadOnDoc <NSObject>
 @optional
--(void)writeData;
--(void)readData;
+-(int)writeData;
+-(int)readData;
 
 
 @end
+
+typedef struct _NameAndPage{
+    char *bookName;
+    int page;
+}_NameAndPage;
 
 @interface DataModel : NSObject
 {
@@ -22,7 +27,7 @@
     NSMutableArray *bookList;
     
     NSString *lpstr;
-    NSString *bookmarks;
+    NSArray *bookmarks;
     
     NSArray *pageCaches;
     
@@ -34,7 +39,7 @@
 @property (strong, nonatomic) NSArray *books;
 @property (strong, nonatomic) NSMutableArray *bookList;
 @property (strong, nonatomic) NSString *lpstr;
-@property (strong, nonatomic) NSString *bookmarks;
+@property (strong, nonatomic) NSArray *bookmarks;
 @property (strong, nonatomic) NSArray *pageCaches;
 @property ( nonatomic) NSInteger *pageNum;
 

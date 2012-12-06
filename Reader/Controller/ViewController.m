@@ -9,6 +9,8 @@
 #import "ViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
+#define FILENAME @"stack.txt"
+
 @interface ViewController ()
 
 @end
@@ -64,15 +66,65 @@
 
 #pragma mark WriteOrReadOnDoc Delegate
 //write data to doc when App end
--(void)writeData
+-(int)writeData
 {
+    NSFileManager *fileMgr = [NSFileManager defaultManager];
+    //指向doc目录
+    NSString *documentsDirectory= [NSHomeDirectory() stringByAppendingPathComponent:@"Documents"];
+    NSString *filePath = [documentsDirectory stringByAppendingString:FILENAME];
     
+    if (![fileMgr fileExistsAtPath:filePath]) {
+        [fileMgr createFileAtPath:filePath contents:nil attributes:nil];
+    }
+    
+//    NSInputStream *inputStream = [[NSInputStream alloc] initWithFileAtPath: filePath];
+//    [inputStream open];
+    
+    
+    NSError *error;
+    
+    NSString *data = [[NSString alloc] initWithString:self.dataModel.lpstr];
+    data = [data stringByAppendingString:@";"];
+    
+    for (NSString *string in self.dataModel.bookmarks) {
+        data = [data stringByAppendingString:string];
+        data = [data stringByAppendingString:@","];
+    }
+    data = [data stringByAppendingString:@";"];
+    
+    for (NSString *list in self.dataModel.bookList) {
+        data = [data stringByAppendingString:list];
+        data = [data stringByAppendingString:@","];
+    }
+    data = [data stringByAppendingString:@";"];
+    
+    //写入文件
+    [data writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:&error];
+    
+    return 1;
 }
 
 //read data from doc when App begin
--(void)readData
+-(int)readData
 {
+    NSFileManager *fileMgr = [NSFileManager defaultManager];
+    //指向doc目录
+    NSString *documentsDirectory= [NSHomeDirectory() stringByAppendingPathComponent:@"Documents"];
+    NSString *filePath = [documentsDirectory stringByAppendingString:FILENAME];
     
+    if (![fileMgr fileExistsAtPath:filePath]) {
+        return 0;
+    }
+    
+    NSError *error;
+    NSString *data = [[NSString alloc] initWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:&error];
+    
+    NSArray *array = [data componentsSeparatedByString:@";"];
+    self.dataModel.lpstr = [array objectAtIndex:0];
+    self.dataModel.bookmarks = [[array objectAtIndex:1] componentsSeparatedByString:@","];
+    self.dataModel.bookList = [[array objectAtIndex:2] componentsSeparatedByString:@","];
+    
+    return 1;
 }
 
 #pragma mark UItableView Delegate And DataSource
@@ -94,7 +146,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 1;
+    return [self.dataModel.bookList count];
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -116,15 +168,13 @@
 }
 
 #pragma mark ReadPageView Delegate
-//when back to bookshelf involking this method to store *lpstr
--(void)storeData
-{
-    
-}
 
 //when back button is pressed,..
 -(void)backToBookshelf:(id)sender
 {
+    self.dataModel.lpstr;
+    
+    
     [self.readPageView removeFromSuperview];
 }
 
@@ -133,11 +183,11 @@
 {
     if (recognizer.direction==UISwipeGestureRecognizerDirectionRight)
     {
-        
+        self.dataModel.pageNum++;
     }
     else if (recognizer.direction==UISwipeGestureRecognizerDirectionLeft)
     {
-        
+        self.dataModel.pageNum--;
     }
 }
 
@@ -151,7 +201,19 @@
 //when add button is pressed,..
 -(void)addBook:(id)sender
 {
-    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSLog(@"documentsDirectory%@",documentsDirectory);
+    NSFileManager *fileManage = [NSFileManager defaultManager];
+    NSArray *files = [fileManage subpathsAtPath: documentsDirectory];
+    NSString *ss = [[NSString alloc] init];
+    for (NSString *s in files) {
+        NSLog(@"%@",s);
+        ss=[ss stringByAppendingString:s];
+        ss=[ss stringByAppendingString:@";"];
+    }
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"File" message:ss delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+    [self.view addSubview:alert];
 }
 
 //when edit button is pressed,..

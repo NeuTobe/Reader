@@ -10,7 +10,6 @@
 
 @protocol ReadPageDelegate <NSObject>
 
--(void)storeData;
 
 
 @end

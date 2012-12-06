@@ -24,6 +24,12 @@ static DataModel *model = nil;
         model = [[DataModel alloc] init];
     }
     
+//    NSFileManager *fileManager = [NSFileManager defaultManager];
+//    
+//    NSArray *paths = NSSearchPathForDirectoriesInDomains( NSDocumentDirectory,                                                                          NSUserDomainMask, YES);
+//    
+//    NSString *documentsDirectory = [paths objectAtIndex:0];
+    
     return model;
 }
 
@@ -33,7 +39,7 @@ static DataModel *model = nil;
         self.lpstr = [[NSString alloc] init];
         self.bookList = [[NSMutableArray alloc] initWithCapacity:50];
         self.books = [[NSMutableArray alloc] initWithCapacity:50];
-        self.bookmarks = [[NSString alloc] init];
+        self.bookmarks = [[NSMutableArray alloc] initWithCapacity:100];
         self.pageCaches = [[NSMutableArray alloc] initWithCapacity:50];
         self.pageNum = 0;
         
